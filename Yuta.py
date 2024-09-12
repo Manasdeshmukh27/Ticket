@@ -14,7 +14,7 @@ HEADERS = {
 }
 
 if 'page' not in st.session_state:
-    st.session_state.update({'page': 'User Info', 'messages': [], 'ticket_type': None, 'query_type': None, 'module': None, 'altmobile_number': None, 'user_name': None, 'client_name': None, 'comment': None, 'ticket_type_asked': False, 'ticket_type_selected': False, 'query_type_asked': False, 'query_type_selected': False, 'module_asked': False, 'module_selected': False, 'altmobile_number_asked': False, 'client_name_asked': False, 'user_name_asked': False, 'comment_asked': False, 'show_ticket_type_select': False, 'show_query_type_select': False, 'show_module_select': False, 'show_client_select': False, 'show_user_select': False })
+    st.session_state.update({'page': 'User Info', 'messages': [], 'ticket_type': None, 'query_type': None, 'module': None, 'altmobile_number': None, 'user_name': None, 'client_name': None, 'comment': None, 'ticket_type_asked': False, 'ticket_type_selected': False, 'query_type_asked': False, 'query_type_selected': False, 'module_asked': False, 'module_selected': False, 'altmobile_number_asked': False, 'client_name_asked': False, 'user_name_asked': False, 'comment_asked': False, 'show_ticket_type_select': False, 'show_query_type_select': False, 'show_module_select': False, 'show_client_select': False, 'show_user_select': False,'ticket_created': False})
 
 CLIENT_NAMES = ["SMARTCARE INSTITUTE OF MEDICAL SCIENCES"]  
 USER_NAMES = ["Aureus Hospital"]
@@ -66,6 +66,9 @@ def submit_ticket(ticket_data):
 
 def handle_user_input(user_input):
     normalized_input = user_input.lower()
+    
+    if st.session_state.ticket_created:
+        return "A ticket has already been created. Please refresh the page to create a new one."
 
     if normalized_input in ["hey", "hi", "hello"]:
         if not st.session_state.query_type_asked:
@@ -134,6 +137,7 @@ def handle_user_input(user_input):
         response += "Download AnyDesk:\n1) [Windows click here](https://anydesk.com/en/downloads/windows)\n2) [Linux click here](https://anydesk.com/en/downloads/linux)\n3) [macOS click here](https://anydesk.com/en/downloads/mac-os)\n"
 
         st.session_state.comment_asked = True
+        st.session_state.ticket_created = True 
         return response
 
 def on_ticket_type_change():
