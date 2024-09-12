@@ -178,9 +178,8 @@ def on_user_name_change():
         st.session_state.comment_asked = True
         st.session_state.messages.append({"role": "assistant", "content": f"User name selected: {selected_user_name}. Please type your comment."})
 
-st.title("Support Ticket System")
+st.title("Submit a Support Ticket")
 if st.session_state.page == "User Info":
-    st.header("Submit a Support Ticket")
     message = st.chat_input("Enter your message")
     
     if message:
