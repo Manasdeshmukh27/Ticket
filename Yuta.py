@@ -1,24 +1,17 @@
-# Support ticket and password chnage with Api Integration
+#Different  pages for both reset  passsword and support ticket
 import streamlit as st
 import re
 import requests
 from datetime import datetime
 
 BASE_URL = "http://103.159.239.203:8080/support/tickets"
-HEADERS = {
-    "Content-Type": "application/json","zoneid": "Asia/Kolkata","userid": "pcsadmin",
-    "clinicid" : "pcsadmin"
-}
+HEADERS = {"Content-Type": "application/json", "zoneid": "Asia/Kolkata", "userid": "pcsadmin","clinicid": "pcsadmin"}
 
 BASE = "http://192.168.0.154:9090/smartcaremain/passwordupdate"
-HEADER = {
-    "Content-Type": "application/json","zoneid": "Asia/Kolkata"
-}
+HEADER = {"Content-Type": "application/json", "zoneid": "Asia/Kolkata"}
 
-if 'page' not in st.session_state:
-    st.session_state.update({'page': 'User Info', 'messages': [], 'ticket_type': None, 'query_type': None, 'module': None, 'altmobile_number': None, 'user_name': None, 'client_name': None, 'comment': None, 'ticket_type_asked': False, 'ticket_type_selected': False, 'query_type_asked': False, 'query_type_selected': False, 'module_asked': False, 'module_selected': False, 'altmobile_number_asked': False, 'client_name_asked': False, 'user_name_asked': False, 'comment_asked': False, 'show_ticket_type_select': False, 'show_query_type_select': False, 'show_module_select': False, 'show_client_select': False, 'show_user_select': False,'ticket_created': False})
-if 'user' not in st.session_state:
-    st.session_state.user = None
+if 'page' not in st.session_state: st.session_state.update({'page': 'User Info', 'messages': [], 'ticket_type': None, 'query_type': None, 'module': None, 'altmobile_number': None, 'user_name': None, 'client_name': None, 'comment': None, 'ticket_type_asked': False, 'ticket_type_selected': False, 'query_type_asked': False, 'query_type_selected': False, 'module_asked': False, 'module_selected': False, 'altmobile_number_asked': False, 'client_name_asked': False, 'user_name_asked': False, 'comment_asked': False, 'show_ticket_type_select': False, 'show_query_type_select': False, 'show_module_select': False, 'show_client_select': False, 'show_user_select': False,'ticket_created': False})
+if 'user' not in st.session_state: st.session_state.user = None
 
 def is_email(input_str):
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -26,7 +19,7 @@ def is_email(input_str):
 
 def is_strong_password(password):
     checks = {
-        "at least 8 characters long": len(password) >= 8,"at least one uppercase letter": re.search(r"[A-Z]", password),"at least one lowercase letter": re.search(r"[a-z]", password), "at least one digit": re.search(r"\d", password),"at least one special character": re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)}
+        "at least 8 characters long": len(password) >= 8,"at least one uppercase letter": re.search(r"[A-Z]", password),"at least one lowercase letter": re.search(r"[a-z]", password),"at least one digit": re.search(r"\d", password), "at least one special character": re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)}
     for message, valid in checks.items():
         if not valid:
             return False, f"Password must contain {message}."
@@ -62,7 +55,7 @@ def display_message(role, content, timestamp=None):
         st.markdown(f'''
         <div style="display: flex; align-items: flex-end; justify-content: flex-end; margin-bottom: 15px;"><div style="background-color: #007BFF; color: white; padding: 10px; border-radius: 10px; text-align: right;"><p style="margin: 0; font-size: 14px;">{content}</p><p style="margin: 0; font-size: 10px; text-align: right; color: #DDDDDD;">{timestamp}</p></div>
         </div> ''', unsafe_allow_html=True)
- 
+
 def is_altmobile_number(user_input):
     return re.fullmatch(r"[1-9]\d{9}", user_input) is not None
 
@@ -84,7 +77,7 @@ def submit_ticket(ticket_data):
 
 def handle_user_input(user_input):
     if user_input.lower() in ["change password", "reset password"]:
-        st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Please provide your email address."}]})
+        st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Please provide your email address."}]} )
         st.session_state.expecting_email = True
 
     elif st.session_state.get('expecting_email', False):
@@ -123,32 +116,24 @@ def handle_user_input(user_input):
                 st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Please retype your new password to confirm."}]})
                 st.session_state.password_step = 2
             else:
-                st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": message}]})
+                st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": message}]} )
                 st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Please enter a stronger password."}]})
         elif st.session_state.password_step == 2:
             if user_input == st.session_state.new_password:
                 if not st.session_state.user or not st.session_state.verified_email:
                     st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "User ID or email not set. Cannot update password."}]})
                     return None
-                if update_user_password(user_input):
-                    st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Your password has been updated successfully."}]})
-                    st.session_state.expecting_new_password = False
-                    st.session_state.password_step = 0
+                if update_user_password(st.session_state.user, st.session_state.verified_email, user_input):
+                    st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Your password has been successfully updated!"}]})
                 else:
-                    st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Failed to update your password. Please try again."}]})
-                    st.session_state.password_step = 1
-            else:
-                st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Passwords do not match. Please try again."}]})
-                st.session_state.password_step = 1
-        return None
+                    st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "Failed to update password. Please try again later."}]})
+                st.session_state.expecting_new_password = False
+                st.session_state.password_step = 0
 
+def handle_input(user_input):
     normalized_input = user_input.lower()
     if st.session_state.ticket_created:
         return "A ticket has already been created. Please refresh the page to create a new one."
-
-    if normalized_input in ["hey", "hi", "hello"]:
-        if not st.session_state.query_type_asked:
-            return "Hello! How can I assist you today? Please type 'okay' to select from the ticket type dropdown."
 
     if not st.session_state.ticket_type_asked:
         if normalized_input == "okay":
@@ -191,7 +176,7 @@ def handle_user_input(user_input):
             st.session_state.update({'user_name_asked': True, 'show_user_select': False, 'comment_asked': True})
             return "User name selected. Please type your comment."
 
-    if st.session_state.comment_asked:
+    if st.session_state.comment_asked: 
         smartcare_ticket_value = "s" if st.session_state.ticket_type.lower() == "smartcare" else "i"
         ticket_data = {
             "mobilneNumber": "7898655451",
@@ -207,6 +192,7 @@ def handle_user_input(user_input):
         submission_response = submit_ticket(ticket_data)
         response = f"Your support ticket has been created. We will get back to you shortly.\n\n{submission_response}\n\nNote: Please share your AnyDesk Id or Skype Id.\n"
         response += "Download AnyDesk:\n1) [Windows click here](https://anydesk.com/en/downloads/windows)\n2) [Linux click here](https://anydesk.com/en/downloads/linux)\n3) [macOS click here](https://anydesk.com/en/downloads/mac-os)\n"
+
         st.session_state.comment_asked = True
         st.session_state.ticket_created = True 
         return response
@@ -254,21 +240,14 @@ def on_user_name_change():
         st.session_state.comment_asked = True
         st.session_state.messages.append({"role": "assistant", "content": f"User name selected: {selected_user_name}. Please type your comment."})
 
-st.title("Submit a Support Ticket or Reset Password")
+def display_password_reset_page():
+    if st.button("Back"):
+        st.session_state.update({'messages': []})
+        st.session_state.page = "User Info"
+        st.experimental_rerun()
 
-if st.session_state.page == "User Info":
-
-    password_reset_clicked = st.button("Reset Password")
-    support_ticket_clicked = st.button("Create Support Ticket")
-
-    if password_reset_clicked:
-        st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "To reset your password, please type 'reset password'."}]})
-        
-    if support_ticket_clicked:
-        st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "For support ticket creation, please type 'hi'."}]})
-
+    st.title("Reset Password")
     message = st.chat_input("Enter your message")
-    
     if message:
         timestamp = datetime.now().strftime("%I:%M %p")
         st.session_state.messages.append({"role": "user", "content": message, "timestamp": timestamp})
@@ -278,6 +257,23 @@ if st.session_state.page == "User Info":
     for msg in st.session_state.messages:
         display_message(msg['role'], msg['content'], msg.get('timestamp'))
 
+def display_Support_Ticket_page():
+    if st.button("Back"):
+        st.session_state.update({'messages': [], 'ticket_type': None, 'query_type': None, 'module': None, 'altmobile_number': None, 'user_name': None, 'client_name': None, 'comment': None, 'ticket_type_asked': False, 'ticket_type_selected': False, 'query_type_asked': False, 'query_type_selected': False, 'module_asked': False, 'module_selected': False, 'altmobile_number_asked': False, 'client_name_asked': False, 'user_name_asked': False, 'comment_asked': False, 'show_ticket_type_select': False, 'show_query_type_select': False, 'show_module_select': False, 'show_client_select': False, 'show_user_select': False, 'ticket_created': False})
+        st.session_state.page = "User Info"
+        st.experimental_rerun()
+   
+    st.title("Support Ticket") 
+    message = st.chat_input("Enter your message")
+    if message:
+        timestamp = datetime.now().strftime("%I:%M %p")
+        st.session_state.messages.append({"role": "user", "content": message, "timestamp": timestamp})
+        bot_response = handle_input(message)
+        st.session_state.messages.append({"role": "assistant", "content": bot_response, "timestamp": timestamp})
+
+    for msg in st.session_state.messages:
+        display_message(msg['role'], msg['content'], msg.get('timestamp'))
+    
     if st.session_state.show_ticket_type_select:
         st.selectbox("Select Ticket Type", ["Select Ticket Type"] + ["Smartcare", "Internal"], key='ticket_type_selectbox', on_change=on_ticket_type_change)
 
@@ -294,3 +290,21 @@ if st.session_state.page == "User Info":
 
     if st.session_state.show_user_select:
         st.selectbox("Select User Name", ["Select User Name"] + USER_NAMES, key='user_name_selectbox', on_change=on_user_name_change)
+
+if st.session_state.page == "User Info":
+    st.title("Submit a Support Ticket or Reset Password")
+    if st.button("Reset Password"):
+        st.session_state.page = "Password Reset"
+        st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "To reset your password, please type 'reset password'."}]})
+        st.experimental_rerun()
+
+    if st.button("Create Support Ticket"):
+        st.session_state.page = "Support Ticket"
+        st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "For support ticket creation, please type 'okay'."}]})
+        st.experimental_rerun()
+
+elif st.session_state.page == "Password Reset":
+    display_password_reset_page()
+
+elif st.session_state.page == "Support Ticket":
+    display_Support_Ticket_page()
