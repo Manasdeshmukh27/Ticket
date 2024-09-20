@@ -244,6 +244,7 @@ def display_password_reset_page():
     if st.button("Back"):
         st.session_state.update({'messages': []})
         st.session_state.page = "User Info"
+        st.experimental_rerun()
         
 
     st.title("Reset Password")
@@ -261,6 +262,7 @@ def display_Support_Ticket_page():
     if st.button("Back"):
         st.session_state.update({'messages': [], 'ticket_type': None, 'query_type': None, 'module': None, 'altmobile_number': None, 'user_name': None, 'client_name': None, 'comment': None, 'ticket_type_asked': False, 'ticket_type_selected': False, 'query_type_asked': False, 'query_type_selected': False, 'module_asked': False, 'module_selected': False, 'altmobile_number_asked': False, 'client_name_asked': False, 'user_name_asked': False, 'comment_asked': False, 'show_ticket_type_select': False, 'show_query_type_select': False, 'show_module_select': False, 'show_client_select': False, 'show_user_select': False, 'ticket_created': False})
         st.session_state.page = "User Info"
+        st.experimental_rerun()
         
    
     st.title("Support Ticket") 
