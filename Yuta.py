@@ -296,12 +296,12 @@ if st.session_state.page == "User Info":
     if st.button("Reset Password"):
         st.session_state.page = "Password Reset"
         st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "To reset your password, please type 'reset password'."}]})
-        st.experimental_rerun()
+       
 
     if st.button("Create Support Ticket"):
         st.session_state.page = "Support Ticket"
         st.session_state.messages.append({"role": "assistant", "content": [{"type": "text", "text": "For support ticket creation, please type 'okay'."}]})
-        st.experimental_rerun()
+        
 
 elif st.session_state.page == "Password Reset":
     display_password_reset_page()
